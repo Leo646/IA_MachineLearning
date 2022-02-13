@@ -4,7 +4,8 @@ Created on Sat Feb 12 14:37:33 2022
 
 @author: leonardo
 """
-#importacion de librerias
+#importación de librerias necesarias 
+#para desplegar la aplicación en una interfaz web
 import numpy as np
 from flask import Flask, request, jsonify, render_template, url_for
 import pickle
@@ -14,7 +15,9 @@ import streamlit as st
 from sklearn.metrics import accuracy_score
 from sklearn.linear_model import LogisticRegression
 
-#Se definen dos funciones para cada mode
+#Se definen dos funciones para cada modelo.
+#Cada funcion recibe como parametros lo valores ingresados por los usuarios
+# y el modelo entrenado
 def model_Logistica(x_in, RegLogist):
     x = np.asarray(x_in).reshape(1,-1)
     preds=RegLogist.predict(x)
@@ -27,7 +30,7 @@ def model_bayes(x_in,NaBay):
 
 
 
-#Llamamos los modelos
+#Ruras donde estan guardads los modelos entrenados
 Ruta1 = 'models/Regresión_Logistica.pkl'
 Ruta2 = 'models/Naive_Bayes.pkl'
 RegLogist=''
@@ -64,7 +67,7 @@ def main():
         return parametros
     #se llaman y visualizan los parametros
     df=parametros_usario()
-    #escoger modelo
+    #Opciones para escoger el modelo
     Opciones_modelos=['Regresion Logística', 'Naive Bayes']
     modelos=st.sidebar.selectbox('Elija el modelo con el que quiere predecir', Opciones_modelos)
     
@@ -73,21 +76,26 @@ def main():
     st.subheader('Datos escogidos por el usuario')
     st.subheader(modelos)
     st.write(df)
+    #boton la predicción
     if st.button('Predecir'):
+        #Si se escoge la Regesion Logistica se presentara los datos de la prediccion
         if modelos=='Regresion Logística':
             predictS = model_Logistica(df, RegLogist)
             #st.success('EL ESTUDIANTE: {}'.format(predictS[0]).upper())
             prediccion=predictS[0]
             x_i=np.asarray(df).reshape(1,-1)
+            #si el valor es 1 aprueba
             if prediccion ==1:
                 st.success('El Estudiante: APRUEBA')
                 probabilidad=RegLogist.predict_proba(x_i)
+                #imprime probabilidad deaprobar
                 st.success('La Probabilidad de aprobar es : :{}'.format(probabilidad[:,1]*100))
             else:
                 st.success('El Estudiante: REPRUEBA')
                 probabilidad=RegLogist.predict_proba(x_i)
                 st.success('La Probabilidad de aprobar es :{}'.format(probabilidad[:,1]*100))
         else:
+            #Si se escoge Naive Bayes se presentara los datos de la prediccion
             predictS1 = model_bayes(df, NaBay)
             #st.success('EL ESTUDIANTE: {}'.format(predictS[0]).upper())
             prediccion=predictS1[0]
